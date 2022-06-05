@@ -3,7 +3,7 @@ using UrlShortener.Domain;
 
 namespace UrlShortener.Persistence
 {
-    public class UrlShortenerDbContext : DbContext
+    public sealed class UrlShortenerDbContext : DbContext
     {
         public UrlShortenerDbContext(DbContextOptions<UrlShortenerDbContext> options)
             : base(options)
@@ -26,7 +26,7 @@ namespace UrlShortener.Persistence
                 .HasForeignKey(p => p.ShortUrlId);
             
             modelBuilder.Entity<ShortUrl>()
-                .HasKey(p => p.GetHashCode());
+                .HasKey(p => p.ShortName);
         }
     }
 }

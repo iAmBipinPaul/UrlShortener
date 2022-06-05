@@ -6,7 +6,6 @@
         public string DestinationUrl { get; set; } = String.Empty;
         public long CreationDateTime { get; set; }
         public long LastUpdateDateTime { get; set; }
-        public List<ShortUrlClick>  ShortUrlClicks { get; set; }
+        public virtual List<ShortUrlClick>  ShortUrlClicks { get; set; }
     }
 } 
- 

@@ -3,8 +3,7 @@
     public class GetShortUrlsRequest
     {
         public string? Query { get; set; }
-        public long SkipCount { get; set; }
-        public long MazResultCount { get; set; }
+        public int SkipCount { get; set; }
+        public int MazResultCount { get; set; }
     }
 }
-  

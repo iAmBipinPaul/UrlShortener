@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\UrlShortener.Shared.csproj" />
+    <ProjectReference Include="..\UrlShortener.Persistence\UrlShortener.Persistence.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+   
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="6.1.2" />
+  </ItemGroup>
 </Project>

@@ -8,6 +8,6 @@
         public string? IpAddress { get; set; }
         public string? UserAgent { get; set; }
 
-        public ShortUrl ShortUrl { get; set; }
+        public virtual ShortUrl ShortUrl { get; set; }
     }
 }
