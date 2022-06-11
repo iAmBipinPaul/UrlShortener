@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Net;
+using FastEndpoints;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 
@@ -6,10 +7,14 @@ namespace UrlShortener.Server.EndPoints
 {
     public class CreateShortUrlEndpoint : Endpoint<CreateShortUrlRequest, CreateShortUrlResponse>
     {
+        private readonly string _tempPassKey;
         private IShortUrlService ShortUrlService { get; set; }
 
-        public CreateShortUrlEndpoint(IShortUrlService shortUrlService)
+        public CreateShortUrlEndpoint(IShortUrlService shortUrlService,
+            IConfiguration configuration
+            )
         {
+            _tempPassKey = configuration.GetValue<string>("TempPassKey") ?? throw new InvalidOperationException();
             this.ShortUrlService = shortUrlService;
         }
 
@@ -23,6 +28,12 @@ namespace UrlShortener.Server.EndPoints
 
         public override async Task HandleAsync(CreateShortUrlRequest req, CancellationToken ct)
         {
+            #region temp soluton😂😂😂😂
+            if (string.IsNullOrWhiteSpace(req.TempPassKey) || req.TempPassKey!=_tempPassKey)
+            {
+                await SendAsync(new CreateShortUrlResponse(), (int)HttpStatusCode.Unauthorized, ct);
+            }
+            #endregion
             var shortUrl = await ShortUrlService.CreateShortUrl(req, ct);
             await SendAsync(shortUrl, cancellation: ct);
         }
@@ -54,10 +65,12 @@ namespace UrlShortener.Server.EndPoints
 
     public class RedirectToDestinationShortUrlsEndpoint : Endpoint<RedirectToDestinationRequest>
     {
+        private readonly string _defaultUrlForRedirect;
         private IShortUrlService ShortUrlService { get; set; }
 
-        public RedirectToDestinationShortUrlsEndpoint(IShortUrlService shortUrlService)
+        public RedirectToDestinationShortUrlsEndpoint(IShortUrlService shortUrlService, IConfiguration configuration)
         {
+            _defaultUrlForRedirect = configuration.GetValue<string>("DefaultUrlForRedirect") ?? throw new InvalidOperationException();
             this.ShortUrlService = shortUrlService;
         }
 
@@ -71,7 +84,7 @@ namespace UrlShortener.Server.EndPoints
 
         public override async Task HandleAsync(RedirectToDestinationRequest reqShortUrl, CancellationToken ct)
         {
-            var redirectUrl = "https://bipinpaul.com";
+            string redirectUrl = _defaultUrlForRedirect;
             if (!string.IsNullOrWhiteSpace(reqShortUrl.ShortName))
             {
                 var shortUrl = await ShortUrlService.GetShortUrl(reqShortUrl.ShortName, ct);
@@ -79,6 +92,11 @@ namespace UrlShortener.Server.EndPoints
                 {
                     redirectUrl = shortUrl.DestinationUrl;
                 }
+            }
+
+            if (string.IsNullOrWhiteSpace(redirectUrl))
+            {
+                redirectUrl = _defaultUrlForRedirect;
             }
             await SendRedirectAsync(redirectUrl, isPermanant: true, cancellation: ct);
         }

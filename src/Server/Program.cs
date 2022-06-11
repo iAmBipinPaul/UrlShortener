@@ -1,14 +1,13 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Microsoft.EntityFrameworkCore;
 using UrlShortener.Applications;
-using UrlShortener.Persistence;
+using UrlShortener.Persistence.Implementations;
+using UrlShortener.Persistence.Interfaces;
 using UrlShortener.Shared.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<UrlShortenerDbContext>(
-        opts => { opts.UseSqlite("Data Source=UrlShortener.db"); });
+builder.Services.AddSingleton<ICosmosDbClient, CosmosDbClient>();
 builder.Services.AddScoped<IShortUrlService,ShortUrlService>();
 builder.Services.AddFastEndpoints();
 builder.Services.AddSwaggerDoc(); //add this
