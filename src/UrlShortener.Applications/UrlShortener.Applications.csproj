@@ -1,17 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Shared\UrlShortener.Shared.csproj" />
-    <ProjectReference Include="..\UrlShortener.Persistence\UrlShortener.Persistence.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-   
-    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="6.1.2" />
-  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\UrlShortener.Persistence\UrlShortener.Persistence.csproj" />
+      <ProjectReference Include="..\UrlShortener.Shared\UrlShortener.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LinqKit.Core" Version="1.2.2" />
+    </ItemGroup>
+
 </Project>

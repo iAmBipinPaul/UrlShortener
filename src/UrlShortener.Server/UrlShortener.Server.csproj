@@ -16,6 +16,7 @@
 		<ProjectReference Include="..\Shared\UrlShortener.Shared.csproj" />
 		<ProjectReference Include="..\UrlShortener.Applications\UrlShortener.Applications.csproj" />
 		<ProjectReference Include="..\UrlShortener.Persistence\UrlShortener.Persistence.csproj" />
+		<ProjectReference Include="..\UrlShortener.Shared\UrlShortener.Shared.csproj" />
 	</ItemGroup>
 
 </Project>
