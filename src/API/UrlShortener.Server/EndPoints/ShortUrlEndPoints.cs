@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using FastEndpoints;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 
@@ -23,22 +25,23 @@ namespace UrlShortener.Server.EndPoints
         {
             Verbs(Http.POST);
             Routes("/api/short-url");
-            AllowAnonymous();
+            AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
         }
 
         public override async Task HandleAsync(CreateShortUrlRequest req, CancellationToken ct)
         {
             #region temp soluton😂😂😂😂
-            if (string.IsNullOrWhiteSpace(req.TempPassKey) || req.TempPassKey!=_tempPassKey)
-            {
-                await SendAsync(new CreateShortUrlResponse(), (int)HttpStatusCode.Unauthorized, ct);
-            }
+            //if (string.IsNullOrWhiteSpace(req.TempPassKey) || req.TempPassKey!=_tempPassKey)
+            //{
+            //    await SendAsync(new CreateShortUrlResponse(), (int)HttpStatusCode.Unauthorized, ct);
+            //}
             #endregion
             var shortUrl = await ShortUrlService.CreateShortUrl(req, ct);
             await SendAsync(shortUrl, cancellation: ct);
         }
     }
 
+   
     public class GetShortUrlsEndpoint : Endpoint<GetShortUrlsRequest, GetShortUrlsResponse>
     {
         private IShortUrlService ShortUrlService { get; set; }
@@ -53,7 +56,7 @@ namespace UrlShortener.Server.EndPoints
         {
             Verbs(Http.GET);
             Routes("/api/short-urls");
-            AllowAnonymous();
+            AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
         }
 
         public override async Task HandleAsync(GetShortUrlsRequest req, CancellationToken ct)

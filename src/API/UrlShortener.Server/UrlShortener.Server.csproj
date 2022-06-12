@@ -7,16 +7,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FastEndpoints.Swagger" Version="4.2.0" />
+		<PackageReference Include="FastEndpoints.Swagger" Version="4.3.0-beta9" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0-preview.4.22251.1" />
 
 	</ItemGroup>
 
 	<ItemGroup>
-
-		<ProjectReference Include="..\Shared\UrlShortener.Shared.csproj" />
 		<ProjectReference Include="..\UrlShortener.Applications\UrlShortener.Applications.csproj" />
 		<ProjectReference Include="..\UrlShortener.Persistence\UrlShortener.Persistence.csproj" />
-		<ProjectReference Include="..\UrlShortener.Shared\UrlShortener.Shared.csproj" />
 	</ItemGroup>
 
 </Project>

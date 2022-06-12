@@ -48,11 +48,12 @@ public class ShortUrlService : IShortUrlService
 
         var queryable = _containerClient
             .GetItemLinqQueryable<ShortUrl>()
-            .Where(predicate);
+            .Where(predicate)
+            .OrderByDescending(c=>c.LastUpdateDateTime);
 
         var linqQuery = queryable
             .Skip(req.SkipCount)
-            .Take(req.MazResultCount);
+            .Take(req.MaxResultCount);
 
         var shortUrlsTask =
              CosmosSqlHelper<ShortUrl>.ToListAsync(_containerClient, linqQuery, _logger,
