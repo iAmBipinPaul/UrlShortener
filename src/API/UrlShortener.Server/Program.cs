@@ -23,8 +23,8 @@ builder.Services.AddAuthentication(o =>
     })
     .AddJwtBearer(o =>
     {
-        o.Authority = builder.Configuration["Auth0:Authority"];
-        o.Audience = builder.Configuration["Auth0:Audience"];
+        o.Authority = builder.Configuration["Auth0_Authority"];
+        o.Audience = builder.Configuration["Auth0_Audience"];
     });
 
 var app = builder.Build();
