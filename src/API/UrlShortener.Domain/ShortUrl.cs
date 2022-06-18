@@ -14,5 +14,6 @@ namespace UrlShortener.Domain
         public long LastUpdateDateTime { get; set; }
         public EntityKind EntityKind { get; set; } = EntityKind.ShortUrl;
         public string PartitionValue { get; set; }
+        public int? ttl { get; set; } = -1;
     }
 } 
