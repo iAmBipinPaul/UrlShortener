@@ -9,7 +9,7 @@ namespace UrlShortener.Domain
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
         public string ShortUrlId { get; set; } = String.Empty;
         public long CreationDateTime { get; set; }
-        public EntityKind EntityKind { get; set; } = EntityKind.ShortUrl;
+        public EntityKind EntityKind { get; set; } = EntityKind.ShortUrlClick;
         public string PartitionValue { get; set; }
         public string? IpAddress { get; set; }
         public ClientInfo? ClientInfo { get; set; }
