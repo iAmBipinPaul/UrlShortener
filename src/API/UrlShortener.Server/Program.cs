@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 builder.Services.AddSingleton<ICosmosDbClient, CosmosDbClient>();
 builder.Services.AddScoped<IShortUrlService, ShortUrlService>();
+builder.Services.AddScoped<IShortUrlClickService, ShortUrlClickService>();
 builder.Services.AddFastEndpoints();
 builder.Services.AddSwaggerDoc();
 
