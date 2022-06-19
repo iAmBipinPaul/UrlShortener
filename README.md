@@ -1,6 +1,6 @@
 ### Url Shortener
 
-Your own URL Shortener Url Shortener build uisng API (ASP.NET Core with fastend point), CosmosDb SQL and Auth0 for
+Your own URL Shortener :  Url Shortener built uisng API (ASP.NET Core with fastend point), CosmosDb SQL and Auth0 for
 authentication and UI (Webassembly Blazor UI)
 
 
