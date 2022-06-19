@@ -33,13 +33,13 @@
     <Columns>
         <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="ShortName" Title="Short Url" Width="100px">
             <Template Context="data">
-                <RadzenLink Path="@(Configuration["BaseOfShortUrl"]+data.ShortName)" Text="@data.ShortName" target="_blank" />
+                <RadzenLink Path="@(Configuration["RemoteHostUrl"]+data.ShortName)" Text="@data.ShortName" target="_blank" />
             </Template>
         </RadzenDataGridColumn>
 
         <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="ShortName" Title="" Width="20px">
             <Template Context="data">
-                <Radzen.Blazor.RadzenButton Icon="bookmarks" Click="@(async e => { await clipboard.WriteTextAsync((Configuration["BaseOfShortUrl"]+data.ShortName));  NotificationService.Notify(new NotificationMessage {Severity = NotificationSeverity.Info, Summary = data.ShortName+" Short Url copied"}); })"></Radzen.Blazor.RadzenButton>
+                <Radzen.Blazor.RadzenButton Icon="bookmarks" Click="@(async e => { await clipboard.WriteTextAsync((Configuration["RemoteHostUrl"]+data.ShortName));  NotificationService.Notify(new NotificationMessage {Severity = NotificationSeverity.Info, Summary = data.ShortName+" Short Url copied"}); })"></Radzen.Blazor.RadzenButton>
             </Template>
         </RadzenDataGridColumn>
 
