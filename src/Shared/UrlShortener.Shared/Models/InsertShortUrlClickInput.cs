@@ -1,4 +1,5 @@
 ﻿using UAParser;
+using UrlShortener.Core;
 
 namespace UrlShortener.Shared.Models
 {
@@ -8,5 +9,6 @@ namespace UrlShortener.Shared.Models
         public long CreationDateTime { get; set; }
         public string? IpAddress { get; set; }
         public ClientInfo? ClientInfo { get; set; }
+        public IpInfo? IpInfo { get; set; }
     }
 }

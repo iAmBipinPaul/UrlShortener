@@ -17,4 +17,8 @@
 	<ItemGroup>
 	  <PackageReference Include="UAParser" Version="3.1.47" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\API\UrlShortener.Core\UrlShortener.Core.csproj" />
+	</ItemGroup>
 </Project>

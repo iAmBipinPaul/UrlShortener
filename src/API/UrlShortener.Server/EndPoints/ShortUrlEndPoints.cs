@@ -2,6 +2,8 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using UAParser;
+using UrlShortener.Applications.Interfaces;
+using UrlShortener.Core;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 
@@ -9,8 +11,8 @@ namespace UrlShortener.Server.EndPoints
 {
     public class CreateShortUrlEndpoint : Endpoint<CreateShortUrlRequest, CreateShortUrlResponse>
     {
-       
         private IShortUrlService ShortUrlService { get; set; }
+
         public CreateShortUrlEndpoint(IShortUrlService shortUrlService
         )
         {
@@ -62,18 +64,27 @@ namespace UrlShortener.Server.EndPoints
         private readonly string _defaultUrlForRedirect;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IShortUrlClickService _shortUrlClickService;
-        private IShortUrlService ShortUrlService { get; set; }
+        private readonly IIpInfoClient _ipInfoClient;
+        private readonly ILogger<RedirectToDestinationShortUrlsEndpoint> _logger;
+        private readonly IShortUrlService _shortUrlService;
+      
 
         public RedirectToDestinationShortUrlsEndpoint(IShortUrlService shortUrlService,
-
             IHttpContextAccessor httpContextAccessor,
             IShortUrlClickService shortUrlClickService,
-            IConfiguration configuration)
+            IIpInfoClient ipInfoClient,
+            IConfiguration configuration,
+            ILogger<RedirectToDestinationShortUrlsEndpoint> logger
+            
+            )
         {
+            _logger = logger;
+            _ipInfoClient = ipInfoClient;
             _shortUrlClickService = shortUrlClickService;
             _httpContextAccessor = httpContextAccessor;
-            _defaultUrlForRedirect = configuration.GetValue<string>("DefaultUrlForRedirect") ?? throw new InvalidOperationException();
-            this.ShortUrlService = shortUrlService;
+            _defaultUrlForRedirect = configuration.GetValue<string>("DefaultUrlForRedirect") ??
+                                     throw new InvalidOperationException();
+            this._shortUrlService = shortUrlService;
         }
 
 
@@ -95,18 +106,36 @@ namespace UrlShortener.Server.EndPoints
             string redirectUrl = _defaultUrlForRedirect;
             if (!string.IsNullOrWhiteSpace(reqShortUrl.ShortName))
             {
-                var shortUrl = await ShortUrlService.GetShortUrl(reqShortUrl.ShortName, ct);
-
-                if (shortUrl != null)
+                var shortUrlTask = _shortUrlService.GetShortUrl(reqShortUrl.ShortName, ct);
+                Task<IpInfo?>? getIpInfoTask = null;
+                if (ipAddress != null)
                 {
+                    getIpInfoTask = _ipInfoClient.Get(ipAddress.ToString());
+                }
+
+                var shortUrl = await shortUrlTask;
+
+                if (shortUrl != null) 
+                {
+                    IpInfo? ipInfo = null;
                     redirectUrl = shortUrl.DestinationUrl;
+                    if (getIpInfoTask != null)
+                    {
+                        try
+                        {
+                            ipInfo = await getIpInfoTask;
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Failed to get Ip info");
+                        }
+                    }
                     await _shortUrlClickService.InsertShortUrlClick(new InsertShortUrlClickInput()
                     {
-
                         ShortUrlId = shortUrl.ShortName,
                         ClientInfo = c,
                         IpAddress = ipAddress?.ToString(),
-
+                        IpInfo = ipInfo
                     }, ct);
                 }
             }
@@ -115,6 +144,7 @@ namespace UrlShortener.Server.EndPoints
             {
                 redirectUrl = _defaultUrlForRedirect;
             }
+
             await SendRedirectAsync(redirectUrl, isPermanant: true, cancellation: ct);
         }
     }

@@ -1,21 +1,15 @@
 ﻿using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using UrlShortener.Domain;
 using UrlShortener.Persistence.Interfaces;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 
-namespace UrlShortener.Applications
+namespace UrlShortener.Applications.Implementations
 {
     public class ShortUrlClickService : IShortUrlClickService
     {
-
         private readonly Container _containerClient;
-     
-
-        public ShortUrlClickService(ICosmosDbClient cosmosDbClient
-        )
+        public ShortUrlClickService(ICosmosDbClient cosmosDbClient)
         {
             _containerClient = cosmosDbClient.GetContainerClient();
         }
@@ -30,7 +24,8 @@ namespace UrlShortener.Applications
                 CreationDateTime = unixTimeMilliseconds,
                 IpAddress = input.IpAddress,
                 ClientInfo = input.ClientInfo,
-                PartitionValue = partitionValue
+                PartitionValue = partitionValue,
+                IpInfo = input.IpInfo
             }, cancellationToken: ct);
         }
     }

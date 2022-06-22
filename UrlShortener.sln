@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9740B6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UrlShortener.Shared", "src\Shared\UrlShortener.Shared\UrlShortener.Shared.csproj", "{E6C9F757-FEC2-4A31-976B-9081458AF39E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UrlShortener.Core", "src\API\UrlShortener.Core\UrlShortener.Core.csproj", "{22F91998-6C74-429F-A3F3-2537DFB9C0B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{E6C9F757-FEC2-4A31-976B-9081458AF39E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6C9F757-FEC2-4A31-976B-9081458AF39E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6C9F757-FEC2-4A31-976B-9081458AF39E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22F91998-6C74-429F-A3F3-2537DFB9C0B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22F91998-6C74-429F-A3F3-2537DFB9C0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22F91998-6C74-429F-A3F3-2537DFB9C0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22F91998-6C74-429F-A3F3-2537DFB9C0B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{725AA977-BF65-41F9-8959-CC971F0CC87A} = {99DD3F20-9B7C-4473-966E-4F57DD0C532D}
 		{9740B6CC-1FA0-4A56-B100-8E66A131438D} = {32EFC907-6256-4B63-93F4-09747317F1EC}
 		{E6C9F757-FEC2-4A31-976B-9081458AF39E} = {9740B6CC-1FA0-4A56-B100-8E66A131438D}
+		{22F91998-6C74-429F-A3F3-2537DFB9C0B0} = {99DD3F20-9B7C-4473-966E-4F57DD0C532D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EA9AC316-DA9E-4FBD-9E42-B26637E1A63A}
