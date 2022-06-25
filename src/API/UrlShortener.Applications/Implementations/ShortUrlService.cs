@@ -33,7 +33,7 @@ namespace UrlShortener.Applications.Implementations
         public async Task<GetShortUrlsResponse> GetShortUrls(GetShortUrlsRequest req, CancellationToken ct)
         {
             var predicate = PredicateBuilder.New<ShortUrl>(true);
-
+            predicate = predicate.And(p => p.EntityKind == EntityKind.ShortUrl);
             if (!string.IsNullOrWhiteSpace(req.Query))
             {
                 var reqQuery = req.Query;
@@ -45,11 +45,10 @@ namespace UrlShortener.Applications.Implementations
                 );
                 predicate = predicate.And(p => p.PartitionValue == partitionValue);
             }
-
             var queryable = _containerClient
                 .GetItemLinqQueryable<ShortUrl>()
                 .Where(predicate)
-                .OrderByDescending(c=>c.LastUpdateDateTime);
+                .OrderByDescending(c => c.LastUpdateDateTime);
 
             var linqQuery = queryable
                 .Skip(req.SkipCount)
@@ -74,7 +73,7 @@ namespace UrlShortener.Applications.Implementations
             };
         }
 
-        public async Task<CreateShortUrlResponse> CreateShortUrl(CreateShortUrlRequest req, CancellationToken ct)
+        public async Task<CreateOrUpdateShortUrlResponse> CreateShortUrl(CreateOrUpdateShortUrlRequest req, CancellationToken ct)
         {
             var unixTimeMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var partitionValue = req.ShortName.FirstOrDefault().ToString().ToLower();
@@ -87,7 +86,7 @@ namespace UrlShortener.Applications.Implementations
                 PartitionValue = partitionValue
             }, cancellationToken: ct);
 
-            return new CreateShortUrlResponse()
+            return new CreateOrUpdateShortUrlResponse()
             {
                 ShortName = req.ShortName,
                 DestinationUrl = req.DestinationUrl,
@@ -118,6 +117,50 @@ namespace UrlShortener.Applications.Implementations
                     DestinationUrl = shortUrls[0].DestinationUrl,
                     LastUpdateDateTime = shortUrls[0].LastUpdateDateTime,
                     CreationDateTime = shortUrls[0].CreationDateTime,
+                };
+            }
+            return null;
+        }
+
+        public async Task DeleteShortUrl(DeleteShortUrlRequest req, CancellationToken ct)
+        {
+            var partitionValue = req.ShortName.FirstOrDefault().ToString().ToLower();
+            await _containerClient.DeleteItemAsync<ShortUrl>(req.ShortName, new PartitionKey(partitionValue), cancellationToken: ct);
+        }
+
+        public async Task<CreateOrUpdateShortUrlResponse?> UpdateShortUrl(CreateOrUpdateShortUrlRequest req, CancellationToken ct)
+        {
+            var partitionValue = req.ShortName.FirstOrDefault().ToString().ToLower();
+            var queryable = _containerClient
+                .GetItemLinqQueryable<ShortUrl>()
+                .Where(c => c.PartitionValue == partitionValue && c.ShortName.ToLower() == req.ShortName.ToLower());
+
+            var linqQuery = queryable;
+
+            var shortUrls = await
+                CosmosSqlHelper<ShortUrl>.ToListAsync(_containerClient, linqQuery, _logger,
+                    _debugMode);
+
+            if (shortUrls.Any())
+            {
+                
+                List<PatchOperation> patchOperations = new List<PatchOperation>
+                {
+                    PatchOperation.Set($"/DestinationUrl",req.DestinationUrl),
+                    PatchOperation.Set($"/LastUpdateDateTime", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
+                };
+              var res=  await _containerClient.PatchItemAsync<ShortUrl>(
+                    id: shortUrls[0].ShortName,
+                    partitionKey: new PartitionKey(partitionValue),
+                    patchOperations: patchOperations,cancellationToken:ct);
+
+
+                return new CreateOrUpdateShortUrlResponse()
+                {
+                    ShortName =res.Resource.ShortName,
+                    CreationDateTime = res.Resource.CreationDateTime,
+                    LastUpdateDateTime = res.Resource.LastUpdateDateTime,
+                    DestinationUrl = res.Resource.DestinationUrl
                 };
             }
             return null;

@@ -8,7 +8,7 @@ using UrlShortener.Persistence.Implementations;
 using UrlShortener.Persistence.Interfaces;
 using UrlShortener.Shared.Interfaces;
 
-bool runOnGoogleCloudRun = true;
+bool runOnGoogleCloudRun = false;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<ForwardedHeadersOptions> (options => 
 {

@@ -9,7 +9,6 @@ namespace UrlShortener.UI.Blazor.Interfaces
 
         Task<GetShortUrlsResponse> GetShortUrls(GetShortUrlsRequest req);
         [Post("/api/short-url")]
-        Task<CreateShortUrlResponse> CreateShortUrl(CreateShortUrlRequest req);
+        Task<CreateOrUpdateShortUrlResponse> CreateShortUrl(CreateOrUpdateShortUrlRequest req);
     }
 }
-//IAccessTokenProvider

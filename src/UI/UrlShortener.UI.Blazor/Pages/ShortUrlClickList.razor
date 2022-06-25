@@ -1,0 +1,69 @@
+﻿@attribute [Authorize]
+@using UrlShortener.Shared.Models
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using Flurl
+@inject HttpClient Http
+<RadzenDataGrid IsLoading=@isLoading Count="@((int) getShortUrlsResponse.TotalCount)" Data="@getShortUrlsResponse.Items" LoadData="@LoadData" AllowPaging="true" PageSize="@getShortUrlsRequest.MaxResultCount" PagerHorizontalAlign="HorizontalAlign.Center" TItem="ShortUrlClickResponse" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn TItem="ShortUrlClickResponse" Property="CreationDateTime" Title="Opened on" Width="75px">
+            <Template Context="data">
+                @DateTimeOffset.FromUnixTimeMilliseconds(data.CreationDateTime).ToLocalTime().ToString("dddd, dd MMMM yyyy hh:mm tt")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ShortUrlClickResponse" Property="IpAddress" Title="Ip" Width="100px">
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ShortUrlClickResponse" Property="IpInfo" Title="Ip Info" Width="200px">
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ShortUrlClickResponse" Property="ClientInfo" Title="Client Info" Width="200px">
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+
+    [Parameter]
+    public ShortUrlsResponse shortUrl { get; set; }
+    GetShortUrlClicksRequest getShortUrlsRequest = new GetShortUrlClicksRequest();
+    GetShortUrlClicksResponse getShortUrlsResponse = new GetShortUrlClicksResponse();
+    bool isLoading = false;
+    protected override async Task OnInitializedAsync()
+    {
+        await GetShortUrls();
+        isLoading = false;
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        await Task.Yield();
+        try
+        {
+            getShortUrlsRequest.SkipCount = args.Skip ?? 0;
+            getShortUrlsRequest.MaxResultCount = args.Top ?? 10;
+            await GetShortUrls();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
+
+    async Task GetShortUrls(bool resetPaginationData = false)
+    {
+        if (resetPaginationData)
+        {
+            getShortUrlsRequest.SkipCount = 0;
+        }
+        isLoading = true;
+        var url = $"/api/short-url-clicks/{shortUrl.ShortName}"
+            .SetQueryParams(new
+            {
+                getShortUrlsRequest.MaxResultCount,
+                getShortUrlsRequest.SkipCount,
+                getShortUrlsRequest.Query
+            });
+        getShortUrlsResponse = await Http.GetFromJsonAsync<GetShortUrlClicksResponse>(url);
+        isLoading = false;
+    }
+
+}

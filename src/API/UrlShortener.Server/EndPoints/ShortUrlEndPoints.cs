@@ -9,7 +9,7 @@ using UrlShortener.Shared.Models;
 
 namespace UrlShortener.Server.EndPoints
 {
-    public class CreateShortUrlEndpoint : Endpoint<CreateShortUrlRequest, CreateShortUrlResponse>
+    public class CreateShortUrlEndpoint : Endpoint<CreateOrUpdateShortUrlRequest, CreateOrUpdateShortUrlResponse>
     {
         private IShortUrlService ShortUrlService { get; set; }
 
@@ -26,15 +26,44 @@ namespace UrlShortener.Server.EndPoints
             Routes("/api/short-url");
             AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
         }
-
-        public override async Task HandleAsync(CreateShortUrlRequest req, CancellationToken ct)
+        public override async Task HandleAsync(CreateOrUpdateShortUrlRequest req, CancellationToken ct)
         {
-            var shortUrl = await ShortUrlService.CreateShortUrl(req, ct);
-            await SendAsync(shortUrl, cancellation: ct);
+            //TODO need to improve this
+            if (!req.ShortName.Contains("\\") && !req.ShortName.Contains("/") &&!req.ShortName.Contains(" ") && !req.ShortName.StartsWith("http"))
+            {
+                var shortUrl = await ShortUrlService.CreateShortUrl(req, ct);
+                await SendAsync(shortUrl, cancellation: ct);
+            }
         }
     }
 
 
+    
+    public class UpdateShortUrlEndpoint : Endpoint<CreateOrUpdateShortUrlRequest, CreateOrUpdateShortUrlResponse>
+    {
+        
+        private IShortUrlService ShortUrlService { get; set; }
+
+        public UpdateShortUrlEndpoint(IShortUrlService shortUrlService
+        )
+        {
+            this.ShortUrlService = shortUrlService;
+        }
+        
+        public override void Configure()
+        {
+            Verbs(Http.PATCH);
+            Routes("/api/short-url");
+            AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
+        }
+
+        public override async Task HandleAsync(CreateOrUpdateShortUrlRequest req, CancellationToken ct)
+        {
+            var shortUrl = await ShortUrlService.UpdateShortUrl(req, ct);
+            if (shortUrl != null) await SendAsync(shortUrl, cancellation: ct);
+        }
+    }
+    
     public class GetShortUrlsEndpoint : Endpoint<GetShortUrlsRequest, GetShortUrlsResponse>
     {
         private IShortUrlService ShortUrlService { get; set; }
@@ -56,6 +85,29 @@ namespace UrlShortener.Server.EndPoints
         {
             var shortUrls = await ShortUrlService.GetShortUrls(req, ct);
             await SendAsync(shortUrls, cancellation: ct);
+        }
+    }
+    
+    public class DeleteShortUrlsEndpoint : Endpoint<DeleteShortUrlRequest>
+    {
+        private IShortUrlService ShortUrlService { get; set; }
+
+        public DeleteShortUrlsEndpoint(IShortUrlService shortUrlService)
+        {
+            this.ShortUrlService = shortUrlService;
+        }
+
+        public override void Configure()
+        {
+            Verbs(Http.DELETE);
+            Routes("/api/short-url/{ShortName}");
+            AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
+        }
+
+        public override async Task HandleAsync(DeleteShortUrlRequest req, CancellationToken ct)
+        {
+            await ShortUrlService.DeleteShortUrl(req, ct);
+            await SendOkAsync(ct);
         }
     }
 

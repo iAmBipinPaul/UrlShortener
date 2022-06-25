@@ -25,7 +25,7 @@
 
 </EditForm>
 <div class="d-flex align-items-center justify-content-end">
-    <RadzenButton Icon="add" Click="@(async () =>await OpenOrder())" Text="Customer" />
+    <RadzenButton Icon="add" Click="@(async () =>await AddShortLink())" Text="Link" />
 </div>
 
 <br />
@@ -33,7 +33,7 @@
     <Columns>
         <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="ShortName" Title="Short Url" Width="100px">
             <Template Context="data">
-                <RadzenLink Path="@(Configuration["RemoteHostUrl"]+data.ShortName)" Text="@data.ShortName" target="_blank" />
+                <RadzenLink Path="@(Configuration["RemoteHostUrl"]+"/"+data.ShortName)" Text="@data.ShortName" target="_blank" />
             </Template>
         </RadzenDataGridColumn>
 
@@ -55,15 +55,22 @@
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="CreationDateTime" Title="Created on" Width="140px">
+        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="CreationDateTime" Title="Created on" Width="75px">
             <Template Context="data">
                 @DateTimeOffset.FromUnixTimeMilliseconds(data.CreationDateTime).ToLocalTime().ToString("dddd, dd MMMM yyyy hh:mm tt")
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="LastUpdateDateTime" Title="Last Updated on" Width="200px">
+        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="LastUpdateDateTime" Title="Last Updated on" Width="75px">
             <Template Context="data">
                 @DateTimeOffset.FromUnixTimeMilliseconds(data.LastUpdateDateTime).ToLocalTime().ToString("dddd, dd MMMM yyyy hh:mm tt")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ShortUrlsResponse" Title="Action" Width="50px">
+            <Template Context="data">
+                <RadzenButton  Icon="delete"  Click="@(() => Delete(data))" />
+                   <RadzenButton Icon="edit"  Click="@(() => EditShortLink(data))" />
+                   <RadzenButton Icon="visibility"  Click="@(() => ViewShortUrlClicks(data))" />
             </Template>
         </RadzenDataGridColumn>
 
@@ -83,7 +90,7 @@
         await GetShortUrls();
         isLoading = false;
     }
- 
+
     async Task LoadData(LoadDataArgs args)
     {
 
@@ -130,13 +137,40 @@
         _dialogService.OnClose -= Close;
     }
 
-    private async Task OpenOrder()
+    private async Task AddShortLink()
     {
         await _dialogService.OpenAsync<CreateOrUpdateShortUrl>($"Add Short URL",
-            new Dictionary<string, object>() {{"createShortUrlRequest", new CreateShortUrlRequest()}},
-            new DialogOptions() {Width = "700px", Height = "275px", Resizable = true, Draggable = true});
+            new Dictionary<string, object>() { { "CreateOrUpdateShortUrlRequest", new CreateOrUpdateShortUrlRequest() } },
+            new DialogOptions() { Width = "700px", Height = "275px", Resizable = true, Draggable = true });
+    }
+    
+    private async Task EditShortLink(ShortUrlsResponse response)
+    {
+        await _dialogService.OpenAsync<CreateOrUpdateShortUrl>($"Add Short URL",
+            new Dictionary<string, object>() { { "CreateOrUpdateShortUrlRequest", new CreateOrUpdateShortUrlRequest()
+            {
+                ShortName = response.ShortName,
+                DestinationUrl = response.DestinationUrl,
+                IsEdit = true
+            } } },
+            new DialogOptions() { Width = "700px", Height = "275px", Resizable = true, Draggable = true });
+    }
+    
+    private async Task ViewShortUrlClicks(ShortUrlsResponse response)
+    {
+        await _dialogService.OpenAsync<ShortUrlClickList>($"{response.ShortName}",
+            new Dictionary<string, object>() { { "shortUrl", response } },
+            new DialogOptions() { Width = "1881px", Height = "600px", Resizable = true, Draggable = true,Top = "20px"});
     }
 
+    private async Task Delete(ShortUrlsResponse shortUrlsResponse)
+    {
+        var res = await _dialogService.Confirm("Are you sure?", $"Delete: {shortUrlsResponse.ShortName} ", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (res.HasValue && res.Value)
+        {
+            await Http.DeleteAsync($"/api/short-url/{shortUrlsResponse.ShortName}");
+        }
+    }
 
     async void Close(dynamic result)
     {
@@ -146,7 +180,7 @@
             {
                 if (userCreatedOrUpdated)
                 {
-                   await GetShortUrls(true);
+                    await GetShortUrls(true);
                     StateHasChanged();
                 }
             }

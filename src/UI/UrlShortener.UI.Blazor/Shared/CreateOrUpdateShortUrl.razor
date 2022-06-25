@@ -1,16 +1,12 @@
 ﻿@attribute [Authorize]
 @using UrlShortener.Shared.Models
 @using Microsoft.AspNetCore.Authorization
-@using CurrieTechnologies.Razor.Clipboard
 @inject HttpClient Http
-@inject IConfiguration Configuration
-@inject ClipboardService clipboard
-@inject NotificationService NotificationService
 @inject DialogService DialogService
 
 
 
-<RadzenTemplateForm Data="@createShortUrlRequest" Submit="@(async (CreateShortUrlRequest args) => { await Submit(args); })">
+<RadzenTemplateForm Data="@CreateOrUpdateShortUrlRequest" Submit="@(async (CreateOrUpdateShortUrlRequest args) => { await Submit(args); })">
     <RadzenFieldset>
 
         <div class="row">
@@ -18,7 +14,7 @@
                 <RadzenLabel Text="Short Name" />
             </div>
             <div class="col-md-8">
-                <RadzenTextBox ReadOnly="@isEditMode" @bind-Value="@createShortUrlRequest.ShortName" style="width: 100%;" Name="ShortName" />
+                <RadzenTextBox ReadOnly="@CreateOrUpdateShortUrlRequest.IsEdit" @bind-Value="@CreateOrUpdateShortUrlRequest.ShortName" style="width: 100%;" Name="ShortName" />
             </div>
         </div>
 
@@ -27,7 +23,7 @@
                 <RadzenLabel Text="Destination Url" />
             </div>
             <div class="col-md-8">
-                <RadzenTextBox ReadOnly="@isEditMode" @bind-Value="@createShortUrlRequest.DestinationUrl" style="width: 100%;" Name="DestinationUrl" />
+                <RadzenTextBox  @bind-Value="@CreateOrUpdateShortUrlRequest.DestinationUrl" style="width: 100%;" Name="DestinationUrl" />
             </div>
         </div>
 
@@ -44,14 +40,22 @@
 @code {
 
     [Parameter]
-    public CreateShortUrlRequest createShortUrlRequest { get; set; }
+    public CreateOrUpdateShortUrlRequest CreateOrUpdateShortUrlRequest { get; set; }
 
     [Parameter]
     public bool isEditMode { get; set; }
 
-    async Task Submit(CreateShortUrlRequest arg)
+    async Task Submit(CreateOrUpdateShortUrlRequest arg)
     {
-        await Http.PostAsJsonAsync("/api/short-url", arg);
+        if (arg.IsEdit)
+        {
+            
+            await Http.PatchAsJsonAsync("/api/short-url", arg);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("/api/short-url", arg); 
+        }
         DialogService.Close(true);
     }
 
