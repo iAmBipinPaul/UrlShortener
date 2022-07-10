@@ -10,6 +10,7 @@
 @inject ClipboardService clipboard
 @inject NotificationService NotificationService
 @inject DialogService _dialogService
+@inject ContextMenuService ContextMenuService
 @implements IDisposable
 <EditForm Model="@getShortUrlsRequest" OnValidSubmit="@(_ => GetShortUrls(true))">
     <div class="row">
@@ -29,55 +30,44 @@
 </div>
 
 <br />
-<RadzenDataGrid IsLoading=@isLoading Count="@((int)getShortUrlsResponse.TotalCount)" Data="@getShortUrlsResponse.Items" LoadData="@LoadData" AllowPaging="true" PageSize="@getShortUrlsRequest.MaxResultCount" PagerHorizontalAlign="HorizontalAlign.Center" TItem="ShortUrlsResponse" ColumnWidth="200px">
+<RadzenDataGrid IsLoading=@isLoading Count="@((int)getShortUrlsResponse.TotalCount)" Data="@getShortUrlsResponse.Items" LoadData="@LoadData" AllowPaging="true" PageSize="@getShortUrlsRequest.MaxResultCount" PagerHorizontalAlign="HorizontalAlign.Center" TItem="ShortUrlsResponse" ColumnWidth="200px"
+
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedShortUrlsResponse
+                CellContextMenu="@OnCellContextMenu">
     <Columns>
         <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="ShortName" Title="Short Url" Width="100px">
             <Template Context="data">
-                <RadzenLink Path="@(Configuration["RemoteHostUrl"]+"/"+data.ShortName)" Text="@data.ShortName" target="_blank" />
+                <RadzenLink Path="@(Configuration["RemoteHostUrl"] + "/" + data.ShortName)" Text="@data.ShortName" target="_blank" />
+                <Radzen.Blazor.RadzenButton ButtonStyle="ButtonStyle.Light" Style="float: right;" Icon="content_copy" Click="@(async e => { await clipboard.WriteTextAsync((Configuration["RemoteHostUrl"]+"/"+data.ShortName));  NotificationService.Notify(new NotificationMessage {Severity = NotificationSeverity.Info, Summary = data.ShortName+" Short Url copied"}); })"></Radzen.Blazor.RadzenButton>
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="ShortName" Title="" Width="20px">
-            <Template Context="data">
-                <Radzen.Blazor.RadzenButton Icon="bookmarks" Click="@(async e => { await clipboard.WriteTextAsync((Configuration["RemoteHostUrl"]+data.ShortName));  NotificationService.Notify(new NotificationMessage {Severity = NotificationSeverity.Info, Summary = data.ShortName+" Short Url copied"}); })"></Radzen.Blazor.RadzenButton>
-            </Template>
-        </RadzenDataGridColumn>
-
+        
         <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="DestinationUrl" Title="Destination Url" Width="140px">
             <Template Context="data">
                 <RadzenLink Path="@data.DestinationUrl" Text="@data.DestinationUrl" target="_blank" />
+                <Radzen.Blazor.RadzenButton ButtonStyle="ButtonStyle.Light" Style="float: right;" Icon="content_copy" Click="@(async e => { await clipboard.WriteTextAsync(data.DestinationUrl);  NotificationService.Notify(new NotificationMessage {Severity = NotificationSeverity.Info, Summary = data.ShortName+" Destination Url copied"}); })"></Radzen.Blazor.RadzenButton>
+
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="DestinationUrl" Title="" Width="20px">
+
+        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="CreationDateTime" Title="Created on" Width="40px">
             <Template Context="data">
-                <Radzen.Blazor.RadzenButton Icon="bookmarks" Click="@(async e => { await clipboard.WriteTextAsync(data.DestinationUrl);  NotificationService.Notify(new NotificationMessage {Severity = NotificationSeverity.Info, Summary = data.ShortName+" Destination Url copied"}); })"></Radzen.Blazor.RadzenButton>
+                @DateTimeOffset.FromUnixTimeMilliseconds(data.CreationDateTime).ToLocalTime().ToString("dd MMMM yyyy hh:mm tt")
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="CreationDateTime" Title="Created on" Width="75px">
+        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="LastUpdateDateTime" Title="Last Updated on" Width="40px">
             <Template Context="data">
-                @DateTimeOffset.FromUnixTimeMilliseconds(data.CreationDateTime).ToLocalTime().ToString("dddd, dd MMMM yyyy hh:mm tt")
+                @DateTimeOffset.FromUnixTimeMilliseconds(data.LastUpdateDateTime).ToLocalTime().ToString("dd MMMM yyyy hh:mm tt")
             </Template>
         </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Property="LastUpdateDateTime" Title="Last Updated on" Width="75px">
-            <Template Context="data">
-                @DateTimeOffset.FromUnixTimeMilliseconds(data.LastUpdateDateTime).ToLocalTime().ToString("dddd, dd MMMM yyyy hh:mm tt")
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ShortUrlsResponse" Title="Action" Width="50px">
-            <Template Context="data">
-                <RadzenButton  Icon="delete"  Click="@(() => Delete(data))" />
-                   <RadzenButton Icon="edit"  Click="@(() => EditShortLink(data))" />
-                   <RadzenButton Icon="visibility"  Click="@(() => ViewShortUrlClicks(data))" />
-            </Template>
-        </RadzenDataGridColumn>
-
     </Columns>
 </RadzenDataGrid>
 
 @code {
+    IList<ShortUrlsResponse> selectedShortUrlsResponse;
     private CreateOrUpdateShortUrl createOrEditCustomerModal;
     GetShortUrlsRequest getShortUrlsRequest = new GetShortUrlsRequest();
     GetShortUrlsResponse getShortUrlsResponse = new GetShortUrlsResponse();
@@ -90,6 +80,38 @@
         await GetShortUrls();
         isLoading = false;
     }
+
+    Task OnCellContextMenu(DataGridCellMouseEventArgs<ShortUrlsResponse> args)
+    {
+        selectedShortUrlsResponse = new List<ShortUrlsResponse>() { args.Data };
+
+        async void Click(MenuItemEventArgs e)
+        {
+            ContextMenuService.Close();
+            if (e.Value.ToString() == "1")
+            {
+                await ViewShortUrlClicks(args.Data);
+            }
+            else if (e.Value.ToString() == "2")
+            {
+                await EditShortLink(args.Data);
+            }
+            else if (e.Value.ToString() == "3")
+            {
+                await Delete(args.Data); 
+            }
+           
+        }
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "View", Value = 1 },
+                new ContextMenuItem(){ Text = "Edit", Value = 2 }, 
+                new ContextMenuItem(){ Text = "Delete", Value = 3 },
+            }, Click);
+        return Task.CompletedTask;
+    }
+
 
     async Task LoadData(LoadDataArgs args)
     {
@@ -143,7 +165,7 @@
             new Dictionary<string, object>() { { "CreateOrUpdateShortUrlRequest", new CreateOrUpdateShortUrlRequest() } },
             new DialogOptions() { Width = "700px", Height = "275px", Resizable = true, Draggable = true });
     }
-    
+
     private async Task EditShortLink(ShortUrlsResponse response)
     {
         await _dialogService.OpenAsync<CreateOrUpdateShortUrl>($"Add Short URL",
@@ -155,12 +177,12 @@
             } } },
             new DialogOptions() { Width = "700px", Height = "275px", Resizable = true, Draggable = true });
     }
-    
+
     private async Task ViewShortUrlClicks(ShortUrlsResponse response)
     {
         await _dialogService.OpenAsync<ShortUrlClickList>($"{response.ShortName}",
             new Dictionary<string, object>() { { "shortUrl", response } },
-            new DialogOptions() { Width = "1881px", Height = "600px", Resizable = true, Draggable = true,Top = "20px"});
+            new DialogOptions() { Width = "1581px", Height = "600px", Resizable = true, Draggable = true, Top = "20px" });
     }
 
     private async Task Delete(ShortUrlsResponse shortUrlsResponse)

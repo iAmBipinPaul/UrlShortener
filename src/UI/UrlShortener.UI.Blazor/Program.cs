@@ -23,6 +23,7 @@ builder.Services.AddHttpClient("ServerAPI",
 builder.Services.AddClipboard();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
     .CreateClient("ServerAPI"));
 
