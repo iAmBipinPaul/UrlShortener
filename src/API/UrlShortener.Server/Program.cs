@@ -21,7 +21,7 @@ builder.Services.AddSingleton<ICosmosDbClient, CosmosDbClient>();
 builder.Services.AddScoped<IShortUrlService, ShortUrlService>();
 builder.Services.AddScoped<IShortUrlClickService, ShortUrlClickService>();
 builder.Services.AddFastEndpoints();
-builder.Services.AddSwaggerDoc();
+builder.Services.SwaggerDocument();
 
 builder.Services.AddHttpClient<IIpInfoClient, IpInfoClient>();
 
@@ -46,7 +46,7 @@ app.UseAuthorization();
 app.UseFastEndpoints();
 
 app.UseOpenApi();
-app.UseSwaggerUi3(s => s.ConfigureDefaults());
+app.UseSwaggerGen(); //add this
 
 if (runOnGoogleCloudRun)
 {

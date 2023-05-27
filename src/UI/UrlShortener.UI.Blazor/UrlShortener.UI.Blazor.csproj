@@ -7,17 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CurrieTechnologies.Razor.Clipboard" Version="1.4.0" />
-    <PackageReference Include="Flurl" Version="3.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.4.22251.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0-preview.4.22251.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.0-preview.4.22251.1" />
-    <PackageReference Include="Radzen.Blazor" Version="3.18.14" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
+    <Compile Remove="Implementations\**" />
+    <Content Remove="Implementations\**" />
+    <EmbeddedResource Remove="Implementations\**" />
+    <None Remove="Implementations\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Implementations\" />
+    <PackageReference Include="CurrieTechnologies.Razor.Clipboard" Version="1.4.0" />
+    <PackageReference Include="Flurl" Version="3.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.5" />
+    <PackageReference Include="Radzen.Blazor" Version="3.18.14" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
   </ItemGroup>
 
   <ItemGroup>
