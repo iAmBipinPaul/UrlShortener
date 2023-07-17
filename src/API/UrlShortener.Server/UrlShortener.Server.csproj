@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FastEndpoints.Swagger" Version="5.12.0" />
+		<PackageReference Include="FastEndpoints.Swagger" Version="5.14.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
 
 	</ItemGroup>
