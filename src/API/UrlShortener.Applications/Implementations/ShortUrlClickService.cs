@@ -23,7 +23,7 @@ namespace UrlShortener.Applications.Implementations
             var partitionValue = input.ShortUrlId.FirstOrDefault().ToString().ToLower();
             var shortUrlClick = new ShortUrlClick()
             {
-                ShortUrlId = input.ShortUrlId,
+                ShortUrlId = input.ShortUrlId.ToLower(),
                 CreationDateTime = unixTimeMilliseconds,
                 IpAddress = input.IpAddress,
                 ClientInfo = JsonConvert.SerializeObject(input.ClientInfo),
