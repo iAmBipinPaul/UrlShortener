@@ -1,13 +1,12 @@
 ### Url Shortener
 
-Your own URL Shortener :  Url Shortener built uisng API (ASP.NET Core Minima,), PostgreSQL and Auth0 for
+Your own URL Shortener :  Url Shortener built using API (ASP.NET Core Minima,), PostgreSQL and Auth0 for
 authentication and UI (Webassembly Blazor UI)
 
 
 -----------------
 
-1. [API](https://github.com/iAmBipinPaul/UrlShortener/tree/main/src/API/UrlShortener.Server) : Built on ASP.NET core
-   with FastEndpoints(.NET 7)
+1. [API](https://github.com/iAmBipinPaul/UrlShortener/tree/main/src/API/UrlShortener.Server) : Built on ASP.NET core minimal API (.NET 7)
 2. [UI](https://github.com/iAmBipinPaul/UrlShortener/tree/main/src/UI/UrlShortener.UI.Blazor) : Blazor Webassembly
 
 ## Getting started
@@ -16,10 +15,10 @@ authentication and UI (Webassembly Blazor UI)
 
 ### Prerequisites
 
-* [.NET 7 Preview 4](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
-* [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/)
+* [.NET ](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+* [Visual Studio 2022 ](https://visualstudio.microsoft.com/)
   or [VS Code](https://code.visualstudio.com/) or [Rider](https://www.jetbrains.com/rider/)
-  (prefer VS 2022 preview due to preview version of .NET 7)
+  (VS 2022)
 
 ### Setting up project locally
 
