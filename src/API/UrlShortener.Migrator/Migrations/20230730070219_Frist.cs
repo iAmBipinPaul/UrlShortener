@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using UAParser;
+using UrlShortener.Core;
 
 #nullable disable
 
 namespace UrlShortener.Migrator.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Frist : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,25 +16,28 @@ namespace UrlShortener.Migrator.Migrations
                 name: "ShortUrls",
                 columns: table => new
                 {
-                    ShortName = table.Column<string>(type: "TEXT", nullable: false),
-                    DestinationUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    CreationDateTime = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastUpdateDateTime = table.Column<long>(type: "INTEGER", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    ShortName = table.Column<string>(type: "text", nullable: false),
+                    DestinationUrl = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    CreationDateTime = table.Column<long>(type: "bigint", nullable: false),
+                    LastUpdateDateTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShortUrls", x => x.ShortName);
+                    table.PrimaryKey("PK_ShortUrls", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ShortUrlClicks",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    ShortUrlId = table.Column<string>(type: "TEXT", nullable: false),
-                    CreationDateTime = table.Column<long>(type: "INTEGER", nullable: false),
-                    IpAddress = table.Column<string>(type: "TEXT", nullable: true),
-                    UserAgent = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    ShortUrlId = table.Column<string>(type: "text", nullable: false),
+                    CreationDateTime = table.Column<long>(type: "bigint", nullable: false),
+                    IpAddress = table.Column<string>(type: "text", nullable: true),
+                    IpInfo = table.Column<IpInfo>(type: "jsonb", nullable: true),
+                    ClientInfo = table.Column<ClientInfo>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -41,7 +46,7 @@ namespace UrlShortener.Migrator.Migrations
                         name: "FK_ShortUrlClicks_ShortUrls_ShortUrlId",
                         column: x => x.ShortUrlId,
                         principalTable: "ShortUrls",
-                        principalColumn: "ShortName",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 

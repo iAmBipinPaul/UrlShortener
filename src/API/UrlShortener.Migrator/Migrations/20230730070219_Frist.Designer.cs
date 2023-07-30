@@ -3,38 +3,53 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using UAParser;
+using UrlShortener.Core;
 using UrlShortener.Persistence;
 
 #nullable disable
 
 namespace UrlShortener.Migrator.Migrations
 {
-    [DbContext(typeof(UrlShortenerDbContext))]
-    [Migration("20220605182503_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(UrlShortenerContext))]
+    [Migration("20230730070219_Frist")]
+    partial class Frist
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.0-preview.4.22229.2");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "7.0.9")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("UrlShortener.Domain.ShortUrl", b =>
                 {
-                    b.Property<string>("ShortName")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<long>("CreationDateTime")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("DestinationUrl")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<long>("LastUpdateDateTime")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bigint");
 
-                    b.HasKey("ShortName");
+                    b.Property<string>("ShortName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
 
                     b.ToTable("ShortUrls");
                 });
@@ -42,20 +57,24 @@ namespace UrlShortener.Migrator.Migrations
             modelBuilder.Entity("UrlShortener.Domain.ShortUrlClick", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<ClientInfo>("ClientInfo")
+                        .HasColumnType("jsonb");
 
                     b.Property<long>("CreationDateTime")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("IpAddress")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
+
+                    b.Property<IpInfo>("IpInfo")
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("ShortUrlId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

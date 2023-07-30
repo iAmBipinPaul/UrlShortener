@@ -13,7 +13,8 @@ namespace UrlShortener.Migrator
         public TContext CreateDbContext(string[] args)
         {
             var basePath = Directory.GetCurrentDirectory() +
-                           string.Format("{0}..{0}Server", Path.DirectorySeparatorChar);
+                           string.Format("{0}..{0}UrlShortener.Server", Path.DirectorySeparatorChar);
+            Console.WriteLine(basePath);
             return Create(basePath, Environment.GetEnvironmentVariable(AspNetCoreEnvironment));
         }
 
@@ -45,7 +46,7 @@ namespace UrlShortener.Migrator
 
             var optionsBuilder = new DbContextOptionsBuilder<TContext>();
 
-            optionsBuilder.UseSqlite(connectionString, b => b.MigrationsAssembly("UrlShortener.Migrator"));
+            optionsBuilder.UseNpgsql(connectionString, b => b.MigrationsAssembly("UrlShortener.Migrator"));
 
             return CreateNewInstance(optionsBuilder.Options);
         }
