@@ -1,12 +1,7 @@
 ﻿using LinqKit;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using UrlShortener.Domain;
 using UrlShortener.Persistence;
-using UrlShortener.Persistence.Interfaces;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 
@@ -14,23 +9,13 @@ namespace UrlShortener.Applications.Implementations
 {
     public class ShortUrlService : IShortUrlService
     {
-        private readonly Container _containerClient;
-        private readonly ILogger<ShortUrlService> _logger;
-        private readonly bool _debugMode;
         private readonly UrlShortenerContext _urlShortenerContext;
-
-        public ShortUrlService(ICosmosDbClient cosmosDbClient,
-            UrlShortenerContext urlShortenerContext,
-            IConfiguration configuration,
-            ILogger<ShortUrlService> logger
+        public ShortUrlService(
+            UrlShortenerContext urlShortenerContext
         )
         {
             _urlShortenerContext = urlShortenerContext;
-            _debugMode = configuration.GetValue<bool>("DebugMode");
-            _logger = logger;
-            _containerClient = cosmosDbClient.GetContainerClient();
         }
-
         public async Task<GetShortUrlsResponse> GetShortUrls(GetShortUrlsRequest req, CancellationToken ct)
         {
             var predicate = PredicateBuilder.New<ShortUrl>(true);
@@ -52,9 +37,10 @@ namespace UrlShortener.Applications.Implementations
                 .Take(req.MaxResultCount);
             return new GetShortUrlsResponse()
             {
-                TotalCount = await CosmosLinqExtensions.CountAsync(baseQuery, ct),
+                TotalCount = await baseQuery.CountAsync(ct),
                 Items = await queryWithLimit.Select(c => new ShortUrlsResponse
                 {
+                    Id = c.Id,
                     ShortName = c.ShortName,
                     DestinationUrl = c.DestinationUrl,
                     LastUpdateDateTime = c.LastUpdateDateTime,
@@ -78,12 +64,7 @@ namespace UrlShortener.Applications.Implementations
                 PartitionValue = partitionValue
             };
             _urlShortenerContext.ShortUrls.Add(shortUrl);
-            var tasks = new List<Task>()
-            {
-                _containerClient.CreateItemAsync(shortUrl, cancellationToken: ct),
-                _urlShortenerContext.SaveChangesAsync(ct)
-            };
-            await Task.WhenAll(tasks);
+            await _urlShortenerContext.SaveChangesAsync(ct);
             return new CreateOrUpdateShortUrlResponse()
             {
                 Id = shortUrl.Id,
@@ -108,68 +89,39 @@ namespace UrlShortener.Applications.Implementations
                     CreationDateTime = res.CreationDateTime,
                 };
             }
-
             return null;
         }
 
         public async Task DeleteShortUrl(DeleteShortUrlRequest req, CancellationToken ct)
         {
-            var partitionValue = req.ShortName.FirstOrDefault().ToString().ToLower();
-            var tasks = new List<Task>
-            {
-                _containerClient.DeleteItemAsync<ShortUrl>(req.ShortName, new PartitionKey(partitionValue),
-                    cancellationToken: ct)
-            };
             var user = await _urlShortenerContext.ShortUrls.FirstOrDefaultAsync(
                 c => c.Id == req.ShortName.ToLower(), ct);
             if (user != null)
             {
                 _urlShortenerContext.ShortUrls.Remove(user);
-                tasks.Add(_urlShortenerContext.SaveChangesAsync(ct));
+                await _urlShortenerContext.SaveChangesAsync(ct);
             }
-            await Task.WhenAll(tasks);
         }
 
         public async Task<CreateOrUpdateShortUrlResponse?> UpdateShortUrl(CreateOrUpdateShortUrlRequest req,
             CancellationToken ct)
         {
-            var partitionValue = req.ShortName.FirstOrDefault().ToString().ToLower();
-            var queryable = _containerClient
-                .GetItemLinqQueryable<ShortUrl>()
-                .Where(c => c.PartitionValue == partitionValue && c.ShortName.ToLower() == req.ShortName.ToLower());
-
-            var linqQuery = queryable;
-
-            var shortUrls = await
-                CosmosSqlHelper<ShortUrl>.ToListAsync(_containerClient, linqQuery, _logger,
-                    _debugMode);
-
-            if (shortUrls.Any())
+            var shortUrl =
+                await _urlShortenerContext.ShortUrls.FirstOrDefaultAsync(c => c.Id == req.ShortName.ToLower(),ct);
+            if (shortUrl != null)
             {
-                var shortUrl = new ShortUrl() { Id = shortUrls[0].ShortName.ToLower() };
-                _urlShortenerContext.ShortUrls.Update(shortUrl);
                 shortUrl.DestinationUrl = req.DestinationUrl;
                 shortUrl.LastUpdateDateTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                var tasks = new List<Task> { _urlShortenerContext.SaveChangesAsync(ct) };
-                List<PatchOperation> patchOperations = new List<PatchOperation>
-                {
-                    PatchOperation.Set($"/DestinationUrl", req.DestinationUrl),
-                    PatchOperation.Set($"/LastUpdateDateTime", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),
-                };
-                tasks.Add(_containerClient.PatchItemAsync<ShortUrl>(
-                    id: shortUrls[0].ShortName,
-                    partitionKey: new PartitionKey(partitionValue),
-                    patchOperations: patchOperations, cancellationToken: ct));
-                await Task.WhenAll(tasks);
+                _urlShortenerContext.ShortUrls.Update(shortUrl);
+                await _urlShortenerContext.SaveChangesAsync(ct);
                 return new CreateOrUpdateShortUrlResponse()
                 {
-                    ShortName = shortUrls[0].ShortName,
-                    CreationDateTime = shortUrls[0].CreationDateTime,
+                    ShortName = shortUrl.ShortName,
+                    CreationDateTime = shortUrl.CreationDateTime,
                     LastUpdateDateTime = shortUrl.LastUpdateDateTime,
                     DestinationUrl = shortUrl.DestinationUrl
                 };
             }
-
             return null;
         }
     }

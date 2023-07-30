@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +8,6 @@ using UrlShortener.Applications.Implementations;
 using UrlShortener.Applications.Interfaces;
 using UrlShortener.Core;
 using UrlShortener.Persistence;
-using UrlShortener.Persistence.Implementations;
-using UrlShortener.Persistence.Interfaces;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 
@@ -26,7 +23,6 @@ var connectionString
 builder.Services.AddDbContext<UrlShortenerContext>(
         opts => { opts.UseNpgsql(connectionString); });
 builder.Services.AddCors();
-builder.Services.AddSingleton<ICosmosDbClient, CosmosDbClient>();
 builder.Services.AddScoped<IShortUrlService, ShortUrlService>();
 builder.Services.AddScoped<IShortUrlClickService, ShortUrlClickService>();
 

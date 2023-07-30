@@ -17,8 +17,10 @@ namespace UrlShortener.Domain
         [Column(TypeName = "jsonb")]
         public IpInfo? IpInfo { get; set; }
         [Column(TypeName = "jsonb")]
-        public ClientInfo? ClientInfo { get; set; }
+        public string? ClientInfo { get; set; }
         public int? ttl { get; set; } = 7889238; //3 month
+        [JsonIgnore]
         public ShortUrl ShortUrl { get; set; }
     }
+    
 } 

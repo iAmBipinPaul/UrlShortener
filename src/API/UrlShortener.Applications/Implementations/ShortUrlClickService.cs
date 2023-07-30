@@ -1,26 +1,21 @@
 ﻿using LinqKit;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using UrlShortener.Domain;
 using UrlShortener.Persistence;
-using UrlShortener.Persistence.Interfaces;
 using UrlShortener.Shared.Interfaces;
 using UrlShortener.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using UAParser;
 
 namespace UrlShortener.Applications.Implementations
 {
     public class ShortUrlClickService : IShortUrlClickService
     {
-        private readonly Container _containerClient;
         private readonly UrlShortenerContext _urlShortenerContext; 
-        public ShortUrlClickService(ICosmosDbClient cosmosDbClient,IConfiguration configuration,
-            UrlShortenerContext urlShortenerContext,
-            ILogger<ShortUrlClickService> logger)
+        public ShortUrlClickService(
+            UrlShortenerContext urlShortenerContext)
         {
             _urlShortenerContext = urlShortenerContext;
-            _containerClient = cosmosDbClient.GetContainerClient();
         }
         public async Task InsertShortUrlClick(InsertShortUrlClickInput input, CancellationToken ct)
         {
@@ -31,14 +26,13 @@ namespace UrlShortener.Applications.Implementations
                 ShortUrlId = input.ShortUrlId,
                 CreationDateTime = unixTimeMilliseconds,
                 IpAddress = input.IpAddress,
-                ClientInfo = input.ClientInfo,
+                ClientInfo = JsonConvert.SerializeObject(input.ClientInfo),
                 PartitionValue = partitionValue,
-                IpInfo = input.IpInfo
+                IpInfo = input.IpInfo,
+                Id = Guid.NewGuid().ToString()
             };
-            var tasks = new List<Task> { _containerClient.CreateItemAsync(shortUrlClick, cancellationToken: ct) };
             _urlShortenerContext.ShortUrlClicks.Add(shortUrlClick);
-            tasks.Add(_urlShortenerContext.SaveChangesAsync(ct));
-            await Task.WhenAll(tasks);
+            await _urlShortenerContext.SaveChangesAsync(ct);
         }
 
         public async Task<GetShortUrlClicksResponse> GetShortUrlClicks(GetShortUrlClicksRequest req, CancellationToken ct)
@@ -60,14 +54,19 @@ namespace UrlShortener.Applications.Implementations
             return new GetShortUrlClicksResponse()
             {
                 TotalCount =await queryable.CountAsync(ct),
-                Items = res.Select(c => new ShortUrlClickResponse()
+                Items = res.Select(c =>
                 {
-                    Id = c.Id,
-                    ShortUrlId = c.ShortUrlId,
-                    CreationDateTime = c.CreationDateTime,
-                    IpAddress = c.IpAddress,
-                    IpInfo = $"{c.IpInfo?.City},{c.IpInfo?.Region},{c.IpInfo?.Country} ({c.IpInfo?.Org})",
-                    ClientInfo = $"{c.ClientInfo?.OS?.Family} {c.ClientInfo?.OS?.Major} , {c.ClientInfo?.Device?.Brand} {c.ClientInfo?.Device?.Family},{c.ClientInfo?.UA?.Family} {c.ClientInfo?.UA?.Major}"
+                    var clientInfo=  c.ClientInfo is null ?null:JsonConvert.DeserializeObject<ClientInfo>(c.ClientInfo);
+                    return new ShortUrlClickResponse()
+                    {
+                        Id = c.Id,
+                        ShortUrlId = c.ShortUrlId,
+                        CreationDateTime = c.CreationDateTime,
+                        IpAddress = c.IpAddress,
+                        IpInfo = $"{c.IpInfo?.City},{c.IpInfo?.Region},{c.IpInfo?.Country} ({c.IpInfo?.Org})",
+                        ClientInfo =
+                            $"{clientInfo?.OS?.Family} {clientInfo?.OS?.Major} , {clientInfo?.Device?.Brand} {clientInfo?.Device?.Family},{clientInfo?.UA?.Family} {clientInfo?.UA?.Major}"
+                    };
                 }).ToList()
             };
         }

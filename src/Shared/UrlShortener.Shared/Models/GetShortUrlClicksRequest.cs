@@ -23,6 +23,10 @@ public class GetShortUrlClicksRequest
             SkipCount = skipCount,
             MaxResultCount = maxResultCount
         };
+        if (result.MaxResultCount==0)
+        {
+            result.MaxResultCount = 10;
+        }
         return ValueTask.FromResult<GetShortUrlClicksRequest?>(result);
     }
 

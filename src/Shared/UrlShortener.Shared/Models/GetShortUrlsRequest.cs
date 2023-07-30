@@ -21,6 +21,10 @@ namespace UrlShortener.Shared.Models
                 SkipCount = skipCount,
                 MaxResultCount= maxResultCount
             };
+            if (result.MaxResultCount==0)
+            {
+                result.MaxResultCount = 10;
+            }
             return ValueTask.FromResult<GetShortUrlsRequest?>(result);
         }
     }
