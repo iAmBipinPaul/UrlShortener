@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/api/short-url-clicks/{shortUrlId}",
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 async (IShortUrlClickService shortUrlClickService, string shortUrlId,  GetShortUrlClicksRequest request,
             CancellationToken ct) =>
         {
@@ -64,7 +65,7 @@ async (IShortUrlClickService shortUrlClickService, string shortUrlId,  GetShortU
 
 
 app.MapPost("api/short-url",
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 async (IShortUrlService shortUrlService, CreateOrUpdateShortUrlRequest request,
             CancellationToken ct) =>
         {
@@ -81,7 +82,7 @@ async (IShortUrlService shortUrlService, CreateOrUpdateShortUrlRequest request,
     .WithOpenApi();
 
 app.MapPatch("/api/short-url",
-      //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 async (IShortUrlService shortUrlService, CreateOrUpdateShortUrlRequest request,
             CancellationToken ct) =>
         {
@@ -97,7 +98,7 @@ async (IShortUrlService shortUrlService, CreateOrUpdateShortUrlRequest request,
 
 
 app.MapGet("/api/short-urls",
-       // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 async (IShortUrlService shortUrlService,GetShortUrlsRequest request,
             CancellationToken ct) =>
         {
@@ -108,7 +109,7 @@ async (IShortUrlService shortUrlService,GetShortUrlsRequest request,
 
 
 app.MapDelete("/api/short-url/{shortName}",
-      //  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 async (IShortUrlService shortUrlService, string shortName,
             CancellationToken ct) =>
         {
