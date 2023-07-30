@@ -1,6 +1,6 @@
 ### Url Shortener
 
-Your own URL Shortener :  Url Shortener built uisng API (ASP.NET Core with fastend point), CosmosDb SQL and Auth0 for
+Your own URL Shortener :  Url Shortener built uisng API (ASP.NET Core Minima,), PostgreSQL and Auth0 for
 authentication and UI (Webassembly Blazor UI)
 
 
@@ -28,9 +28,9 @@ authentication and UI (Webassembly Blazor UI)
 1. Configuration
 
 ```json 
- "CosmosDbConnectionString": "Add Cosmos Db account connection string here",
-  "CosmosDbDatabase": "Cosmos Db Database",
-  "Container": "Cosmos Db Container",
+ "ConnectionStrings": { 
+   "DbContext":"Add  connection string here"
+   },
   "DefaultUrlForRedirect": "your own default Url for redirect",
   "Auth0_Authority": "your own auth0 authority", // eg  https://tenant1.jp.auth0.com/
   "Auth0_Audience": "your own auth0 audience" // eg portal.github.in
