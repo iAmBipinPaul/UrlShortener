@@ -3,11 +3,11 @@ using UrlShortener.Persistence;
 
 namespace UrlShortener.Migrator
 {
-    public class DairyDbContextFactory : DesignTimeDbContextFactoryBase<UrlShortenerDbContext>
+    public class DairyDbContextFactory : DesignTimeDbContextFactoryBase<UrlShortenerContext>
     {
-        protected override UrlShortenerDbContext CreateNewInstance(DbContextOptions<UrlShortenerDbContext> options)
+        protected override UrlShortenerContext CreateNewInstance(DbContextOptions<UrlShortenerContext> options)
         {
-            return new UrlShortenerDbContext(options);
+            return new UrlShortenerContext(options);
         }
     }
 }
