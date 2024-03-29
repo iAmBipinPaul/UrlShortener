@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="LinqKit.Core" Version="1.2.4" />
+      <PackageReference Include="LinqKit.Core" Version="1.2.5" />
     </ItemGroup>
 
 </Project>
