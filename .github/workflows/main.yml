@@ -1,0 +1,17 @@
+﻿name: ASPNETCoreCI
+
+on:
+  push:
+    branches: [ main ]
+jobs:
+  ubuntu-latest:
+    name: ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: dotnet run --project ./build/_build.csproj
+        run: |
+          sed -i -e 's|#pat|'$DockerRegistryPassword'|g' ./nuget.config
+          dotnet run  --project ./build/_build.csproj
+        env:
+          DockerRegistryPassword: ${{ secrets.DockerRegistryPassword }}
