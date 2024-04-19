@@ -6,6 +6,7 @@ using UrlShortener.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using UAParser;
+using UrlShortener.Core;
 
 namespace UrlShortener.Applications.Implementations
 {
@@ -28,7 +29,7 @@ namespace UrlShortener.Applications.Implementations
                 IpAddress = input.IpAddress,
                 ClientInfo = JsonConvert.SerializeObject(input.ClientInfo),
                 PartitionValue = partitionValue,
-                IpInfo = input.IpInfo,
+                IpInfo = JsonConvert.SerializeObject(input.IpInfo) ,
                 Id = Guid.NewGuid().ToString()
             };
             _urlShortenerContext.ShortUrlClicks.Add(shortUrlClick);
@@ -57,13 +58,14 @@ namespace UrlShortener.Applications.Implementations
                 Items = res.Select(c =>
                 {
                     var clientInfo=  c.ClientInfo is null ?null:JsonConvert.DeserializeObject<ClientInfo>(c.ClientInfo);
+                    var ipInfo=  c.IpInfo is null ?null:JsonConvert.DeserializeObject<IpInfo>(c.IpInfo);
                     return new ShortUrlClickResponse()
                     {
                         Id = c.Id,
                         ShortUrlId = c.ShortUrlId,
                         CreationDateTime = c.CreationDateTime,
                         IpAddress = c.IpAddress,
-                        IpInfo = $"{c.IpInfo?.City},{c.IpInfo?.Region},{c.IpInfo?.Country} ({c.IpInfo?.Org})",
+                        IpInfo = $"{ipInfo?.City},{ipInfo?.Region},{ipInfo?.Country} ({ipInfo?.Org})",
                         ClientInfo =
                             $"{clientInfo?.OS?.Family} {clientInfo?.OS?.Major} , {clientInfo?.Device?.Brand} {clientInfo?.Device?.Family},{clientInfo?.UA?.Family} {clientInfo?.UA?.Major}"
                     };

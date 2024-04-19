@@ -15,7 +15,7 @@ namespace UrlShortener.Domain
         public string PartitionValue { get; set; }
         public string? IpAddress { get; set; }
         [Column(TypeName = "jsonb")]
-        public IpInfo? IpInfo { get; set; }
+        public string? IpInfo { get; set; }
         [Column(TypeName = "jsonb")]
         public string? ClientInfo { get; set; }
         public int? ttl { get; set; } = 7889238; //3 month
