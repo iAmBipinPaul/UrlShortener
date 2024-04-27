@@ -40,7 +40,7 @@ namespace UrlShortener.Applications.Implementations
         {
             var predicate = PredicateBuilder.New<ShortUrlClick>(true);
             predicate = predicate.And(p =>
-                p.ShortUrlId==req.ShortUrlId 
+                p.ShortUrlId==req.ShortUrlId.ToLower() 
             );
             var queryable =  _urlShortenerContext.ShortUrlClicks
                 .Where(predicate);
