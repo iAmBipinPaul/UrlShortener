@@ -27,12 +27,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UrlShortener.Core", "src\AP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UrlShortener.Migrator", "src\API\UrlShortener.Migrator\UrlShortener.Migrator.csproj", "{202F4543-181D-483D-B36F-1C8EF60A72A1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{55AD7BB6-FB83-4CB1-954B-810D09BE1F4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55AD7BB6-FB83-4CB1-954B-810D09BE1F4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55AD7BB6-FB83-4CB1-954B-810D09BE1F4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA65EA48-573F-4017-9CC2-3D30F3F315CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BA65EA48-573F-4017-9CC2-3D30F3F315CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA65EA48-573F-4017-9CC2-3D30F3F315CC}.Release|Any CPU.ActiveCfg = Release|Any CPU

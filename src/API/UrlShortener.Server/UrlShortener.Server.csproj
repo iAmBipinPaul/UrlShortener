@@ -8,7 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 
@@ -16,5 +16,13 @@
 		<ProjectReference Include="..\UrlShortener.Applications\UrlShortener.Applications.csproj" />
 		<ProjectReference Include="..\UrlShortener.Persistence\UrlShortener.Persistence.csproj" />
 	</ItemGroup>
-
+	<PropertyGroup>
+		<ContainerFamily>jammy</ContainerFamily>
+		<ContainerRuntimeIdentifier>linux-arm64</ContainerRuntimeIdentifier>
+		<ContainerRepository>ghcr.io/iambipinpaul/urlshortener</ContainerRepository>
+		<ContainerRegistry>ghcr.io</ContainerRegistry>
+	</PropertyGroup>
+	<ItemGroup>
+		<ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/iAmBipinPaul/UrlShortener" />
+	</ItemGroup>
 </Project>
