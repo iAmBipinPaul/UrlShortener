@@ -19,7 +19,7 @@
 	<PropertyGroup>
 		<ContainerFamily>jammy</ContainerFamily>
 		<ContainerRuntimeIdentifier>linux-arm64</ContainerRuntimeIdentifier>
-		<ContainerRepository>ghcr.io/iambipinpaul/urlshortener</ContainerRepository>
+		<ContainerRepository>ghcr.io/iambipinpaul/urlshortener.api</ContainerRepository>
 		<ContainerRegistry>ghcr.io</ContainerRegistry>
 	</PropertyGroup>
 	<ItemGroup>

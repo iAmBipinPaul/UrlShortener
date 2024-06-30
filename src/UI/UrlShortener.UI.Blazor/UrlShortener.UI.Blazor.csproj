@@ -27,4 +27,15 @@
     <ProjectReference Include="..\..\Shared\UrlShortener.Shared\UrlShortener.Shared.csproj" />
   </ItemGroup>
 
+
+  <PropertyGroup>
+    <ContainerFamily>jammy</ContainerFamily>
+    <ContainerRuntimeIdentifier>linux-arm64</ContainerRuntimeIdentifier>
+    <ContainerRepository>ghcr.io/iambipinpaul/urlshortener.ui</ContainerRepository>
+    <ContainerRegistry>ghcr.io</ContainerRegistry>
+  </PropertyGroup>
+  <ItemGroup>
+    <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/iAmBipinPaul/UrlShortener" />
+  </ItemGroup>
+  
 </Project>
