@@ -6,7 +6,7 @@ authentication and UI (Webassembly Blazor UI)
 
 -----------------
 
-1. [API](https://github.com/iAmBipinPaul/UrlShortener/tree/main/src/API/UrlShortener.Server) : Built on ASP.NET core minimal API (.NET 7)
+1. [API](https://github.com/iAmBipinPaul/UrlShortener/tree/main/src/API/UrlShortener.Server) : Built on ASP.NET core minimal API (.NET 8)
 2. [UI](https://github.com/iAmBipinPaul/UrlShortener/tree/main/src/UI/UrlShortener.UI.Blazor) : Blazor Webassembly
 
 ## Getting started
@@ -15,7 +15,7 @@ authentication and UI (Webassembly Blazor UI)
 
 ### Prerequisites
 
-* [.NET ](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+* [.NET ](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 * [Visual Studio 2022 ](https://visualstudio.microsoft.com/)
   or [VS Code](https://code.visualstudio.com/) or [Rider](https://www.jetbrains.com/rider/)
   (VS 2022)
