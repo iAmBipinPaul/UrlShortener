@@ -19,7 +19,8 @@ class Build : NukeBuild
     const string User = "iambipinpaul";
     string Tag = "";
     bool IsMaster;
-    AbsolutePath ProjectPath => RootDirectory / "src"/"API"/"UrlShortener.Server"/ "UrlShortener.Server.csproj";
+    AbsolutePath APIProjectPath => RootDirectory / "src"/"API"/"UrlShortener.Server"/ "UrlShortener.Server.csproj";
+    AbsolutePath UIProjectPath => RootDirectory / "src"/"UI"/"UrlShortener.UI.Blazor"/ "UrlShortener.UI.Blazor.csproj";
     
     Target CheckDockerVersion => _ => _
         .DependsOn(CheckBranch)
@@ -35,7 +36,13 @@ class Build : NukeBuild
         {
            
            DotNetTasks.DotNetPublish(s => s
-               .SetProject(ProjectPath)
+               .SetProject(APIProjectPath)
+               .SetConfiguration(Configuration)
+               .SetProperty("PublishProfile", "DefaultContainer")
+               .SetProperty("ContainerImageTag", Tag));
+           
+           DotNetTasks.DotNetPublish(s => s
+               .SetProject(UIProjectPath)
                .SetConfiguration(Configuration)
                .SetProperty("PublishProfile", "DefaultContainer")
                .SetProperty("ContainerImageTag", Tag));
