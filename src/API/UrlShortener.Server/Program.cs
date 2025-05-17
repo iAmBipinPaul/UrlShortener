@@ -129,8 +129,20 @@ app.MapGet("/{shortName?}",
             ILogger<Program> logger, [FromRoute] string? shortName,
             CancellationToken ct) =>
         {
-            var defaultUrlForRedirect = configuration.GetValue<string>("DefaultUrlForRedirect") ??
-                                        throw new InvalidOperationException();
+            // Read host-to-redirect mapping from configuration
+            var defaultRedirects = configuration.GetSection("DefaultRedirects").Get<Dictionary<string, string>>()
+                                   ?? throw new InvalidOperationException("DefaultRedirects section missing");
+            var requestHost = httpContextAccessor?.HttpContext?.Request?.Host.Host;
+            string defaultUrlForRedirect = null;
+            if (!string.IsNullOrWhiteSpace(requestHost) && defaultRedirects.TryGetValue(requestHost, out var mappedUrl))
+            {
+                defaultUrlForRedirect = mappedUrl;
+            }
+            else
+            {
+                // fallback to first value or throw
+                defaultUrlForRedirect = defaultRedirects.Values.FirstOrDefault() ?? throw new InvalidOperationException();
+            }
             // Try to get the real client IP from Cloudflare header first
             string? cfConnectingIp = httpContextAccessor?.HttpContext?.Request?.Headers["CF-Connecting-IP"].FirstOrDefault();
             IPAddress? ipAddress = null;
