@@ -131,7 +131,17 @@ app.MapGet("/{shortName?}",
         {
             var defaultUrlForRedirect = configuration.GetValue<string>("DefaultUrlForRedirect") ??
                                         throw new InvalidOperationException();
-            IPAddress? ipAddress = httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress;
+            // Try to get the real client IP from Cloudflare header first
+            string? cfConnectingIp = httpContextAccessor?.HttpContext?.Request?.Headers["CF-Connecting-IP"].FirstOrDefault();
+            IPAddress? ipAddress = null;
+            if (!string.IsNullOrWhiteSpace(cfConnectingIp) && IPAddress.TryParse(cfConnectingIp, out var parsedIp))
+            {
+                ipAddress = parsedIp;
+            }
+            else
+            {
+                ipAddress = httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress;
+            }
             var uaString = httpContextAccessor?.HttpContext?.Request?.Headers["User-Agent"].ToString();
             var uaParser = Parser.GetDefault();
             ClientInfo c = uaParser.Parse(uaString);
